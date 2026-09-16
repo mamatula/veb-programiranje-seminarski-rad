@@ -2,7 +2,7 @@
 <html lang="sr">
 <head>
 <meta charset="UTF-8">
-<title>Obračunski list <?= htmlspecialchars($obracun->brojObracuna) ?></title>
+<title>Obračunski list <?= htmlspecialchars($obracun->getBrojObracuna()) ?></title>
 <style>
   body { font-family: "Times New Roman", serif; margin: 30px; color:#111; }
   .dugme-stampaj {
@@ -37,20 +37,20 @@
 
     <table class="podaci">
       <tr>
-        <td style="width:50%;"><strong>Broj obračunskog lista:</strong> <?= htmlspecialchars($obracun->brojObracuna) ?></td>
-        <td><strong>Mesec/godina obračuna:</strong> <?= $nazivMeseca[$obracun->mesec] . ' ' . $obracun->godina ?></td>
+        <td style="width:50%;"><strong>Broj obračunskog lista:</strong> <?= htmlspecialchars($obracun->getBrojObracuna()) ?></td>
+        <td><strong>Mesec/godina obračuna:</strong> <?= $nazivMeseca[$obracun->getMesec()] . ' ' . $obracun->getGodina() ?></td>
       </tr>
       <tr>
-        <td><strong>Zaposleni:</strong> <?= htmlspecialchars($obracun->imeZaposlenog . ' ' . $obracun->prezimeZaposlenog) ?></td>
-        <td><strong>Radno mesto:</strong> <?= htmlspecialchars($obracun->radnoMesto) ?></td>
+        <td><strong>Zaposleni:</strong> <?= htmlspecialchars($obracun->getImeZaposlenog() . ' ' . $obracun->getPrezimeZaposlenog()) ?></td>
+        <td><strong>Radno mesto:</strong> <?= htmlspecialchars($obracun->getRadnoMesto()) ?></td>
       </tr>
       <tr>
-        <td><strong>JMBG:</strong> <?= htmlspecialchars($obracun->jmbg) ?></td>
-        <td><strong>Broj radnih sati:</strong> <?= $obracun->brojRadnihSati ?></td>
+        <td><strong>JMBG:</strong> <?= htmlspecialchars($obracun->getJmbg()) ?></td>
+        <td><strong>Broj radnih sati:</strong> <?= $obracun->getBrojRadnihSati() ?></td>
       </tr>
       <tr>
-        <td><strong>Osnovna zarada (RSD):</strong> <?= number_format($obracun->osnovnaZarada, 2, ',', '.') ?></td>
-        <td><strong>Datum isplate:</strong> <?= htmlspecialchars($obracun->datumIsplate) ?></td>
+        <td><strong>Osnovna zarada (RSD):</strong> <?= number_format($obracun->getOsnovnaZarada(), 2, ',', '.') ?></td>
+        <td><strong>Datum isplate:</strong> <?= htmlspecialchars($obracun->getDatumIsplate()) ?></td>
       </tr>
     </table>
 
@@ -60,18 +60,18 @@
         <tr><th>Rb</th><th>Šifra</th><th>Vrsta stavke</th><th>Tip</th><th class="desno">Iznos (RSD)</th></tr>
       </thead>
       <tbody>
-        <?php foreach ($obracun->stavke as $s): ?>
+        <?php foreach ($obracun->getStavke() as $s): ?>
         <tr>
-          <td><?= $s->redniBroj ?></td>
-          <td><?= htmlspecialchars($s->vrstaStavke->sifra) ?></td>
-          <td><?= htmlspecialchars($s->vrstaStavke->naziv) ?></td>
-          <td><?= $s->vrstaStavke->tip === 'uvecanje' ? 'Uvećanje' : 'Umanjenje' ?></td>
-          <td class="desno"><?= number_format($s->iznos, 2, ',', '.') ?></td>
+          <td><?= $s->getRedniBroj() ?></td>
+          <td><?= htmlspecialchars($s->getVrstaStavke()->sifra) ?></td>
+          <td><?= htmlspecialchars($s->getVrstaStavke()->naziv) ?></td>
+          <td><?= $s->getVrstaStavke()->tip === 'uvecanje' ? 'Uvećanje' : 'Umanjenje' ?></td>
+          <td class="desno"><?= number_format($s->getIznos(), 2, ',', '.') ?></td>
         </tr>
         <?php endforeach; ?>
-        <tr class="ukupno-red"><td colspan="4">Ukupno uvećanje</td><td class="desno"><?= number_format($obracun->ukupnoUvecanje, 2, ',', '.') ?></td></tr>
-        <tr class="ukupno-red"><td colspan="4">Ukupno umanjenje</td><td class="desno"><?= number_format($obracun->ukupnoUmanjenje, 2, ',', '.') ?></td></tr>
-        <tr class="ukupno-red"><td colspan="4">NETO ZA ISPLATU</td><td class="desno"><?= number_format($obracun->netoIznos, 2, ',', '.') ?></td></tr>
+        <tr class="ukupno-red"><td colspan="4">Ukupno uvećanje</td><td class="desno"><?= number_format($obracun->getUkupnoUvecanje(), 2, ',', '.') ?></td></tr>
+        <tr class="ukupno-red"><td colspan="4">Ukupno umanjenje</td><td class="desno"><?= number_format($obracun->getUkupnoUmanjenje(), 2, ',', '.') ?></td></tr>
+        <tr class="ukupno-red"><td colspan="4">NETO ZA ISPLATU</td><td class="desno"><?= number_format($obracun->getNetoIznos(), 2, ',', '.') ?></td></tr>
       </tbody>
     </table>
 

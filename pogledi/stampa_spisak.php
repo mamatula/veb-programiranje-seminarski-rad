@@ -47,12 +47,12 @@
     <tbody>
       <?php foreach ($obracuni as $o): ?>
       <tr>
-        <td><?= htmlspecialchars($o->brojObracuna) ?></td>
-        <td><?= htmlspecialchars($o->imeZaposlenog . ' ' . $o->prezimeZaposlenog) ?></td>
-        <td><?= htmlspecialchars($o->radnoMesto) ?></td>
-        <td><?= str_pad((string) $o->mesec, 2, '0', STR_PAD_LEFT) . '/' . $o->godina ?></td>
-        <td class="desno"><?= number_format($o->osnovnaZarada, 2, ',', '.') ?></td>
-        <td class="desno"><?= number_format($o->netoIznos, 2, ',', '.') ?></td>
+        <td><?= htmlspecialchars($o->getBrojObracuna()) ?></td>
+        <td><?= htmlspecialchars($o->getImeZaposlenog() . ' ' . $o->getPrezimeZaposlenog()) ?></td>
+        <td><?= htmlspecialchars($o->getRadnoMesto()) ?></td>
+        <td><?= str_pad((string) $o->getMesec(), 2, '0', STR_PAD_LEFT) . '/' . $o->getGodina() ?></td>
+        <td class="desno"><?= number_format($o->getOsnovnaZarada(), 2, ',', '.') ?></td>
+        <td class="desno"><?= number_format($o->getNetoIznos(), 2, ',', '.') ?></td>
       </tr>
       <?php endforeach; ?>
       <?php if (empty($obracuni)): ?>

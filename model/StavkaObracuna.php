@@ -1,17 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../tehnoloskeKlase/BaznaEntitetKlasa.php';
 require_once __DIR__ . '/VrstaStavke.php';
 
-//StavkaObracuna – DEO (detail).
-
-class StavkaObracuna extends BaznaEntitetKlasa
+class StavkaObracuna
 {
-    public $idStavke;
-    public $idObracunskogLista;
-    public $vrstaStavke;   // asocijacija: objekat klase VrstaStavke
-    public $redniBroj;
-    public $iznos;
+    private $idStavke;
+    private $idObracunskogLista;
+    private $vrstaStavke;
+    private $redniBroj;
+    private $iznos;
 
     public function __construct($vrstaStavke = null, $redniBroj = 0, $iznos = 0.0, $idObracunskogLista = null, $idStavke = null)
     {
@@ -24,51 +21,53 @@ class StavkaObracuna extends BaznaEntitetKlasa
 
 
 
-
-    public function validiraj()
+    public function getIdStavke()
     {
-        if (!$this->vrstaStavke->idVrsteStavke) {
-            throw new InvalidArgumentException('Vrsta stavke mora biti izabrana iz šifarnika.');
-        }
-        if ($this->iznos <= 0) {
-            throw new InvalidArgumentException('Iznos stavke mora biti veći od 0.');
-        }
+        return $this->idStavke;
     }
 
-
-
-    public function sacuvaj($idObracunskogLista)
+    public function setIdStavke($idStavke)
     {
-        $this->validiraj();
+        $this->idStavke = $idStavke;
+    }
+
+    public function getIdObracunskogLista()
+    {
+        return $this->idObracunskogLista;
+    }
+
+    public function setIdObracunskogLista($idObracunskogLista)
+    {
         $this->idObracunskogLista = $idObracunskogLista;
-
-        self::izvrsiUpit(
-            'INSERT INTO stavka_obracuna (id_obracunski_list, id_vrsta_stavke, redni_broj, iznos)
-             VALUES (?, ?, ?, ?)',
-            [$idObracunskogLista, $this->vrstaStavke->idVrsteStavke, $this->redniBroj, $this->iznos]
-        );
-
-        $this->idStavke = self::poslednjiId();
     }
 
-
-
-
-    public static function odReda($red)
+    public function getVrstaStavke()
     {
-        $vrsta = new VrstaStavke(
-            null,
-            $red['sifra'] ?? '',
-            $red['naziv_stavke'] ?? '',
-            $red['tip'] ?? 'uvecanje'
-        );
+        return $this->vrstaStavke;
+    }
 
-        return new self(
-            $vrsta,
-            (int) ($red['redni_broj'] ?? 0),
-            (float) ($red['iznos'] ?? 0),
-            isset($red['id_obracunski_list']) ? (int) $red['id_obracunski_list'] : null,
-            isset($red['id_stavka']) ? (int) $red['id_stavka'] : null
-        );
+    public function setVrstaStavke($vrstaStavke)
+    {
+        $this->vrstaStavke = $vrstaStavke;
+    }
+
+    public function getRedniBroj()
+    {
+        return $this->redniBroj;
+    }
+
+    public function setRedniBroj($redniBroj)
+    {
+        $this->redniBroj = $redniBroj;
+    }
+
+    public function getIznos()
+    {
+        return $this->iznos;
+    }
+
+    public function setIznos($iznos)
+    {
+        $this->iznos = $iznos;
     }
 }

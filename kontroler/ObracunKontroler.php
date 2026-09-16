@@ -1,10 +1,10 @@
 <?php
 
 require_once __DIR__ . '/../includes/zastita.php';
+require_once __DIR__ . '/../repozitorijum/ObracunskiListRepo.php';
 require_once __DIR__ . '/../model/ObracunskiList.php';
 require_once __DIR__ . '/../model/StavkaObracuna.php';
 require_once __DIR__ . '/../model/VrstaStavke.php';
-
 
 class ObracunKontroler
 {
@@ -30,7 +30,7 @@ class ObracunKontroler
         $mesecParam = ($mesec !== '' && ctype_digit($mesec)) ? (int) $mesec : null;
         $godinaParam = ($godina !== '' && ctype_digit($godina)) ? (int) $godina : null;
 
-        $obracuni = ObracunskiList::pretraga($prezimeParam, $mesecParam, $godinaParam);
+        $obracuni = ObracunskiListRepo::pretraga($prezimeParam, $mesecParam, $godinaParam);
 
         $poruka = '';
         if (isset($_GET['obrisano'])) {
@@ -132,7 +132,7 @@ class ObracunKontroler
                 $list->dodajStavku(new StavkaObracuna($vrsta, 0, (float) str_replace(',', '.', $iznosSirovo)));
             }
 
-            $noviId = $list->sacuvajSaStavkama();
+            $noviId = ObracunskiListRepo::sacuvajSaStavkama($list);
             header('Location: prikaz.php?id=' . $noviId . '&sacuvano=1');
             exit;
         } catch (InvalidArgumentException $e) {
@@ -146,7 +146,7 @@ class ObracunKontroler
 
     public static function prikaz($id)
     {
-        $obracun = ObracunskiList::ucitajSaStavkama($id);
+        $obracun = ObracunskiListRepo::ucitajSaStavkama($id);
 
         if (!$obracun) {
             header('Location: obracuni.php');
@@ -161,7 +161,7 @@ class ObracunKontroler
 
     public static function formaIzmena($id, $greska = '', $uneseno = null, $prikazStavke = null)
     {
-        $postojeci = ObracunskiList::ucitajSaStavkama($id);
+        $postojeci = ObracunskiListRepo::ucitajSaStavkama($id);
 
         if (!$postojeci) {
             header('Location: obracuni.php');
@@ -173,29 +173,32 @@ class ObracunKontroler
 
         if ($uneseno === null) {
             $uneseno = [
-                'mesec' => $postojeci->mesec,
-                'godina' => $postojeci->godina,
-                'ime' => $postojeci->imeZaposlenog,
-                'prezime' => $postojeci->prezimeZaposlenog,
-                'jmbg' => $postojeci->jmbg,
-                'radno_mesto' => $postojeci->radnoMesto,
-                'broj_sati' => $postojeci->brojRadnihSati,
-                'osnovna' => $postojeci->osnovnaZarada,
-                'datum_isplate' => $postojeci->datumIsplate,
+                'mesec' => $postojeci->getMesec(),
+                'godina' => $postojeci->getGodina(),
+                'ime' => $postojeci->getImeZaposlenog(),
+                'prezime' => $postojeci->getPrezimeZaposlenog(),
+                'jmbg' => $postojeci->getJmbg(),
+                'radno_mesto' => $postojeci->getRadnoMesto(),
+                'broj_sati' => $postojeci->getBrojRadnihSati(),
+                'osnovna' => $postojeci->getOsnovnaZarada(),
+                'datum_isplate' => $postojeci->getDatumIsplate(),
             ];
         }
 
         if ($prikazStavke === null) {
+
+
+
             $mapaSifri = [];
             foreach ($vrsteStavki as $v) {
                 $mapaSifri[$v->sifra] = $v->idVrsteStavke;
             }
 
             $prikazStavke = [];
-            foreach ($postojeci->stavke as $s) {
+            foreach ($postojeci->getStavke() as $s) {
                 $prikazStavke[] = [
-                    'vrsta_id' => $mapaSifri[$s->vrstaStavke->sifra] ?? null,
-                    'iznos' => $s->iznos,
+                    'vrsta_id' => $mapaSifri[$s->getVrstaStavke()->sifra] ?? null,
+                    'iznos' => $s->getIznos(),
                 ];
             }
         }
@@ -207,7 +210,7 @@ class ObracunKontroler
 
     public static function obradiIzmenu($id)
     {
-        $postojeci = ObracunskiList::ucitajSaStavkama($id);
+        $postojeci = ObracunskiListRepo::ucitajSaStavkama($id);
 
         if (!$postojeci) {
             header('Location: obracuni.php');
@@ -233,7 +236,7 @@ class ObracunKontroler
         try {
             $list = new ObracunskiList(
                 $id,
-                $postojeci->brojObracuna, // broj obračuna se pri izmeni ne menja
+                $postojeci->getBrojObracuna(),
                 $uneseno['mesec'],
                 $uneseno['godina'],
                 $uneseno['ime'],
@@ -259,7 +262,7 @@ class ObracunKontroler
                 $list->dodajStavku(new StavkaObracuna($vrsta, 0, (float) str_replace(',', '.', $iznosSirovo)));
             }
 
-            $list->azurirajSaStavkama();
+            ObracunskiListRepo::azurirajSaStavkama($list);
             header('Location: prikaz.php?id=' . $id . '&sacuvano=1');
             exit;
         } catch (InvalidArgumentException $e) {
@@ -273,10 +276,10 @@ class ObracunKontroler
 
     public static function obrisi($id)
     {
-        $obracun = ObracunskiList::ucitajSaStavkama($id);
+        $obracun = ObracunskiListRepo::ucitajSaStavkama($id);
 
         if ($obracun) {
-            $obracun->obrisi();
+            ObracunskiListRepo::obrisi($obracun->getIdObracunskogLista());
         }
 
         header('Location: obracuni.php?obrisano=1');
@@ -289,7 +292,7 @@ class ObracunKontroler
         $mesec = trim($_GET['mesec'] ?? '');
         $godina = trim($_GET['godina'] ?? '');
 
-        $obracuni = ObracunskiList::pretraga(
+        $obracuni = ObracunskiListRepo::pretraga(
             $prezime !== '' ? $prezime : null,
             ($mesec !== '' && ctype_digit($mesec)) ? (int) $mesec : null,
             ($godina !== '' && ctype_digit($godina)) ? (int) $godina : null
@@ -303,7 +306,7 @@ class ObracunKontroler
 
     public static function stampaPojedinacna($id)
     {
-        $obracun = ObracunskiList::ucitajSaStavkama($id);
+        $obracun = ObracunskiListRepo::ucitajSaStavkama($id);
 
         if (!$obracun) {
             header('Location: obracuni.php');

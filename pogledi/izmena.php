@@ -1,7 +1,7 @@
 <?php require __DIR__ . '/zaglavlje.php'; ?>
 
 <div class="kartica">
-  <h2>Izmena obračunskog lista <?= htmlspecialchars($postojeci->brojObracuna) ?></h2>
+  <h2>Izmena obračunskog lista <?= htmlspecialchars($postojeci->getBrojObracuna()) ?></h2>
 
   <?php if ($greska): ?>
     <div class="poruka poruka-greska"><?= htmlspecialchars($greska) ?></div>
@@ -12,7 +12,7 @@
     <div class="mreza-polja">
       <div class="polje">
         <label>Broj obračuna</label>
-        <input type="text" id="polje-broj-obracuna" value="<?= htmlspecialchars($postojeci->brojObracuna) ?>" readonly style="background:#f1f5f9;">
+        <input type="text" id="polje-broj-obracuna" value="<?= htmlspecialchars($postojeci->getBrojObracuna()) ?>" readonly style="background:#f1f5f9;">
       </div>
       <div class="polje">
         <label>Datum isplate *</label>
@@ -91,6 +91,7 @@
 </div>
 
 <?php
+
 $vrsteZaJs = [];
 foreach ($vrsteStavki as $v) {
     $vrsteZaJs[] = ['id' => $v->idVrsteStavke, 'sifra' => $v->sifra, 'naziv' => $v->naziv, 'tip' => $v->tip];
